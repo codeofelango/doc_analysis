@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Document Portal Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google Fonts for premium look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="/static/style.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="logo">📚</span>
+      <h1>Document Portal Pro</h1>
+    </div>
+    <nav class="mode-switch">
+      <button class="tab-btn active" data-tab="analysis">Document Analysis</button>
+      <button class="tab-btn" data-tab="compare">Document Compare</button>
+      <button class="tab-btn" data-tab="chat">Doc Chat</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- ============== ANALYSIS ============== -->
+    <section id="tab-analysis" class="tab-panel active">
+      <div class="card">
+        <h2 data-emoji="🔎">Analyze Document</h2>
+        <p class="muted">Upload a PDF document and get comprehensive AI-powered analysis with structured insights.</p>
+        <form id="form-analyze" class="form-grid" onsubmit="return false;">
+          <div class="field">
+            <label for="an-file">Upload PDF Document</label>
+            <input id="an-file" type="file" accept=".pdf" required />
+            <small class="help">Supports PDF files up to 50MB</small>
+          </div>
+          <div class="actions">
+            <button id="btn-analyze" class="btn primary">Analyze Document</button>
+          </div>
+        </form>
+        <div id="an-result" class="result-block">
+          <h3>Analysis Results</h3>
+          <pre class="code" id="an-json">Ready to analyze your document. Upload a PDF file to get started.</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== COMPARE ============== -->
+    <section id="tab-compare" class="tab-panel">
+      <div class="card">
+        <h2 data-emoji="🆚">Compare Documents</h2>
+        <p class="muted">Upload two PDF documents to perform intelligent comparison and identify key differences.</p>
+        <form id="form-compare" class="form-grid-2" onsubmit="return false;">
+          <div class="field">
+            <label for="cmp-ref">Reference Document</label>
+            <input id="cmp-ref" type="file" accept=".pdf" required />
+          </div>
+          <div class="field">
+            <label for="cmp-act">Comparison Document</label>
+            <input id="cmp-act" type="file" accept=".pdf" required />
+          </div>
+          <div class="actions span-2">
+            <button id="btn-compare" class="btn primary">Compare Documents</button>
+          </div>
+        </form>
+
+        <div id="cmp-result" class="result-block">
+          <h3>Comparison Results</h3>
+          <div class="table-wrap">
+            <table id="cmp-table">
+              <thead>
+                <tr><th>Page</th><th>Detected Changes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="2" class="muted center">Upload two documents to see comparison results</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== CHAT ============== -->
+    <section id="tab-chat" class="tab-panel">
+      <div class="card">
+        <h2 data-emoji="💬">Intelligent Document Chat</h2>
+        <p class="muted">Upload documents and engage in intelligent conversations using advanced RAG technology.</p>
+
+        <form id="form-chat-index" class="form-grid" onsubmit="return false;">
+          <div class="field">
+            <label for="chat-files">Upload Documents</label>
+            <input id="chat-files" type="file" multiple accept=".pdf,.docx,.txt" />
+            <small class="help">Supports PDF, DOCX, and TXT files. Multiple files allowed.</small>
+          </div>
+
+          <div class="grid-3">
+            <div class="field">
+              <label for="chat-session">Session ID</label>
+              <input id="chat-session" type="text" placeholder="Auto-generated if empty" />
+            </div>
+            <div class="field">
+              <label for="chat-chunk">Chunk Size</label>
+              <input id="chat-chunk" type="number" value="1000" min="200" step="100" />
+            </div>
+            <div class="field">
+              <label for="chat-overlap">Chunk Overlap</label>
+              <input id="chat-overlap" type="number" value="200" min="0" step="50" />
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div class="field">
+              <label for="chat-k">Retrieval Count</label>
+              <input id="chat-k" type="number" value="5" min="1" max="20" />
+            </div>
+            <div class="field toggle-row">
+              <label>Session-based FAISS</label>
+              <label class="switch">
+                <input id="chat-sessionized" type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="btn-build" class="btn primary">Build Knowledge Index</button>
+          </div>
+        </form>
+
+        <div class="divider"></div>
+
+        <form id="form-chat-ask" class="form-grid" onsubmit="return false;">
+          <div class="field">
+            <label for="chat-q">Ask a Question</label>
+            <input id="chat-q" type="text" placeholder="What would you like to know about your documents?" />
+          </div>
+          <div class="actions">
+            <button id="btn-ask" class="btn">Send Question</button>
+          </div>
+        </form>
+
+        <div id="chat-meta" class="muted small"></div>
+
+        <div id="chat-ans" class="result-block">
+          <h3>AI Response</h3>
+          <div class="answer" id="chat-answer">Build your knowledge index first, then ask questions about your documents.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div>© 2025 Document Portal Pro • Elite Document Intelligence</div>
+    <div class="tiny">Powered by Advanced AI Technology</div>
+  </footer>
+
+  <script>
+    // Floating particles animation
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 15;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Initialize particles
+    createParticles();
+
+    // API Configuration
+    const API_BASE = "";
+
+    // Tab switching with enhanced animations
+    const tabs = document.querySelectorAll(".tab-btn");
+    const panels = document.querySelectorAll(".tab-panel");
+    
+    tabs.forEach(btn => {
+      btn.addEventListener("click", () => {
+        // Remove active states
+        tabs.forEach(b => b.classList.remove("active"));
+        panels.forEach(p => p.classList.remove("active"));
+        
+        // Add active states
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    // Enhanced loading states
+    function setLoading(element, isLoading, text = "Processing...") {
+      if (isLoading) {
+        element.classList.add("loading");
+        element.textContent = text;
+      } else {
+        element.classList.remove("loading");
+      }
+    }
+
+    // ===== ANALYZE =====
+    document.getElementById("btn-analyze").addEventListener("click", async () => {
+      const file = document.getElementById("an-file").files[0];
+      const out = document.getElementById("an-json");
+      const btn = document.getElementById("btn-analyze");
+      
+      if (!file) { 
+        out.textContent = "Please select a PDF file to analyze."; 
+        return; 
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "Analyzing...";
+        setLoading(out, true, "Running comprehensive document analysis...");
+        
+        const fd = new FormData();
+        fd.append("file", file);
+
+        const res = await fetch(`${API_BASE}/analyze`, { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: res.statusText}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        
+        const json = await res.json();
+        out.textContent = JSON.stringify(json, null, 2);
+        
+        // Success animation
+        out.style.border = "1px solid rgba(67, 233, 123, 0.5)";
+        setTimeout(() => {
+          out.style.border = "1px solid var(--border-primary)";
+        }, 2000);
+        
+      } catch (e) {
+        out.textContent = `Analysis failed: ${e.message || e}`;
+        out.style.border = "1px solid rgba(245, 87, 108, 0.5)";
+        setTimeout(() => {
+          out.style.border = "1px solid var(--border-primary)";
+        }, 2000);
+      } finally {
+        setLoading(out, false);
+        btn.disabled = false;
+        btn.textContent = "Analyze Document";
+      }
+    });
+
+    // ===== COMPARE =====
+    document.getElementById("btn-compare").addEventListener("click", async () => {
+      const ref = document.getElementById("cmp-ref").files[0];
+      const act = document.getElementById("cmp-act").files[0];
+      const tbody = document.querySelector("#cmp-table tbody");
+      const btn = document.getElementById("btn-compare");
+
+      if (!ref || !act) {
+        tbody.innerHTML = `<tr><td colspan="2" class="muted center">Please upload both reference and comparison documents.</td></tr>`;
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "Comparing...";
+        tbody.innerHTML = `<tr><td colspan="2" class="center loading">Performing intelligent document comparison...</td></tr>`;
+
+        const fd = new FormData();
+        fd.append("reference", ref);
+        fd.append("actual", act);
+
+        const res = await fetch(`${API_BASE}/compare`, { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: res.statusText}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        
+        const json = await res.json();
+        const rows = json.rows || [];
+        
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="2" class="muted center">✅ No significant differences detected between the documents.</td></tr>`;
+          return;
+        }
+        
+        tbody.innerHTML = rows.map((r, index) => {
+          const page = r.Page ?? r.page ?? "";
+          const chg = r.Changes ?? r.changes ?? "";
+          return `<tr style="animation-delay: ${index * 0.1}s"><td><strong>Page ${page}</strong></td><td>${chg}</td></tr>`;
+        }).join("");
+        
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="2" class="muted center">❌ Comparison failed: ${e.message || e}</td></tr>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Compare Documents";
+      }
+    });
+
+    // ===== CHAT (index + ask) =====
+    let currentSession = null;
+
+    document.getElementById("btn-build").addEventListener("click", async () => {
+      const files = document.getElementById("chat-files").files;
+      const sessionId = document.getElementById("chat-session").value.trim();
+      const useSess = document.getElementById("chat-sessionized").checked;
+      const k = +document.getElementById("chat-k").value || 5;
+      const chunk = +document.getElementById("chat-chunk").value || 1000;
+      const overlap = +document.getElementById("chat-overlap").value || 200;
+      const meta = document.getElementById("chat-meta");
+      const btn = document.getElementById("btn-build");
+
+      if (!files.length) { 
+        meta.textContent = "⚠️ Please select at least one document to build the knowledge index."; 
+        return; 
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "Building Index...";
+        setLoading(meta, true, "Building intelligent knowledge index from your documents...");
+
+        const fd = new FormData();
+        [...files].forEach(f => fd.append("files", f));
+        if (sessionId) fd.append("session_id", sessionId);
+        fd.append("use_session_dirs", useSess ? "true" : "false");
+        fd.append("chunk_size", String(chunk));
+        fd.append("chunk_overlap", String(overlap));
+        fd.append("k", String(k));
+
+        const res = await fetch(`${API_BASE}/chat/index`, { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: res.statusText}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        
+        const json = await res.json();
+        currentSession = json.session_id || sessionId || null;
+        meta.innerHTML = `✅ <strong>Knowledge index built successfully!</strong><br>
+          Session: ${currentSession || "(global)"} • 
+          Documents: ${files.length} • 
+          Retrieval: Top-${json.k} chunks • 
+          Chunk size: ${chunk}`;
+        meta.style.color = "rgba(67, 233, 123, 0.8)";
+        
+      } catch (e) {
+        meta.textContent = `❌ Index building failed: ${e.message || e}`;
+        meta.style.color = "rgba(245, 87, 108, 0.8)";
+      } finally {
+        setLoading(meta, false);
+        btn.disabled = false;
+        btn.textContent = "Build Knowledge Index";
+        setTimeout(() => {
+          meta.style.color = "var(--text-muted)";
+        }, 3000);
+      }
+    });
+
+    document.getElementById("btn-ask").addEventListener("click", async () => {
+      const q = document.getElementById("chat-q").value.trim();
+      const ans = document.getElementById("chat-answer");
+      const useSess = document.getElementById("chat-sessionized").checked;
+      const k = +document.getElementById("chat-k").value || 5;
+      const btn = document.getElementById("btn-ask");
+
+      if (!q) { 
+        ans.textContent = "Please enter a question about your documents."; 
+        return; 
+      }
+      
+      if (useSess && !currentSession) {
+        ans.innerHTML = `⚠️ <strong>Knowledge index required</strong><br>
+          Please build the knowledge index first when session-based mode is enabled.`;
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "Thinking...";
+        setLoading(ans, true, "AI is analyzing your documents to provide the best answer...");
+
+        const fd = new FormData();
+        fd.append("question", q);
+        fd.append("use_session_dirs", useSess ? "true" : "false");
+        fd.append("k", String(k));
+        if (useSess && currentSession) fd.append("session_id", currentSession);
+
+        const res = await fetch(`${API_BASE}/chat/query`, { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: res.statusText}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        
+        const json = await res.json();
+        ans.innerHTML = `<strong>AI Response:</strong><br><br>${json.answer || "I couldn't find a relevant answer in your documents."}`;
+        
+        // Success border animation
+        ans.style.borderColor = "rgba(67, 233, 123, 0.5)";
+        setTimeout(() => {
+          ans.style.borderColor = "var(--border-primary)";
+        }, 2000);
+        
+      } catch (e) {
+        ans.innerHTML = `❌ <strong>Query failed:</strong><br>${e.message || e}`;
+        ans.style.borderColor = "rgba(245, 87, 108, 0.5)";
+        setTimeout(() => {
+          ans.style.borderColor = "var(--border-primary)";
+        }, 2000);
+      } finally {
+        setLoading(ans, false);
+        btn.disabled = false;
+        btn.textContent = "Send Question";
+      }
+    });
+
+    // Enhanced form submissions with Enter key
+    document.getElementById("chat-q").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        document.getElementById("btn-ask").click();
+      }
+    });
+
+    // Auto-resize text areas and enhanced UX
+    document.addEventListener("DOMContentLoaded", () => {
+      // Add smooth transitions to all interactive elements
+      const interactiveElements = document.querySelectorAll("input, button, .card");
+      interactiveElements.forEach(el => {
+        el.style.transition = "var(--transition)";
+      });
+
+      // File input enhancements
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach(input => {
+        input.addEventListener("change", (e) => {
+          const files = e.target.files;
+          if (files.length > 0) {
+            const fileNames = Array.from(files).map(f => f.name).join(", ");
+            const helper = input.nextElementSibling;
+            if (helper && helper.classList.contains("help")) {
+              helper.textContent = `Selected: ${fileNames}`;
+              helper.style.color = "rgba(79, 172, 254, 0.8)";
+            }
+          }
+        });
+      });
+
+      // Enhanced hover effects for cards
+      const cards = document.querySelectorAll(".card");
+      cards.forEach(card => {
+        card.addEventListener("mouseenter", () => {
+          card.style.transform = "translateY(-6px) scale(1.02)";
+        });
+        
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "translateY(0) scale(1)";
+        });
+      });
+
+      // Parallax effect for particles
+      window.addEventListener("scroll", () => {
+        const scrolled = window.pageYOffset;
+        const particles = document.querySelectorAll(".particle");
+        particles.forEach((particle, index) => {
+          const speed = 0.5 + (index % 3) * 0.2;
+          particle.style.transform = `translateY(${scrolled * speed}px)`;
+        });
+      });
+
+      // Progressive enhancement for browsers that support it
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        });
+
+        document.querySelectorAll(".card, .result-block").forEach(el => {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(20px)";
+          el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+          observer.observe(el);
+        });
+      }
+    });
+
+    // Performance optimization: Debounced resize handler
+    let resizeTimeout;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Recalculate particles on resize
+        const particles = document.querySelectorAll(".particle");
+        particles.forEach(particle => {
+          particle.style.left = Math.random() * 100 + '%';
+        });
+      }, 150);
+    });
+
+    // Dark mode toggle (bonus feature)
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    if (mediaQuery.matches) {
+      document.documentElement.style.setProperty('--bg-primary', '#ffffff');
+      document.documentElement.style.setProperty('--text-primary', '#1a202c');
+    }
+  </script>
+
+</body>
+</html>
